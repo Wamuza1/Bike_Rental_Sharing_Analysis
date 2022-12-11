@@ -60,7 +60,7 @@ the city could be detected via monitoring these data.
 
 # Decompose your data:
    
-   # Does the series appear to have trends or seasonality?
+   ### Does the series appear to have trends or seasonality?
     
    - Use decompose() or stl() to examine and possibly remove components of the series
 
