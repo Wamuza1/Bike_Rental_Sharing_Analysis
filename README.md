@@ -7,7 +7,7 @@ The purpose of this analysis is to predict the total count of bike rentals, incl
 
 ## Data Dictionary:
 
-# Both hour.csv and day.csv have the following fields, except hr which is not available in day.csv
+### hour.csv and day.csv have the following fields, except hr which is not available in day.csv
 
  - instant: record index
  - dteday : date
