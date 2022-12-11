@@ -1,8 +1,9 @@
 # Bike_Rental_Sharing_Analysis
+Time-series forecasting is a technique that utilizes historical and current data to predict future values over a period of time or a specific point in the future. By analyzing data that we stored in the past, we can make informed decisions that can guide our business strategy and help us understand future trends.
 
-Bike_rental sharing systems are new generation of traditional bike rentals where whole process from membership, 
-rental and return back has become automatic. Through these systems, user is able to easily rent a bike 
-from a particular position and return back at another position.
+Bike_rental sharing systems are new generation of traditional bike rentals where whole process from membership, rental and return back has become automatic. Through these systems, user is able to easily rent a bike from a particular position and return back at another position.
+
+The purpose of this analysis is to predict the total count of bike rentals, including both casual and registered riders, for the next 30 days. By analyzing Date factor , time of day, we can gain a better understanding of the bike rental trends and make more accurate predictions for the future. This analysis will provide valuable insight for bike rental companies, allowing them to better plan for the future and make more informed decisions.
 
 ## Data Dictionary:
 
@@ -69,6 +70,8 @@ from a particular position and return back at another position.
    
    - Choose order of the ARIMA by examining ACF and PACF plots
    -  Fit an ARIMA model with optimal parameters(p,d,q)
+   -  p is the highest lag in the time series
+   -  q is the number of past errors included
 
 ########## Evaluate and iterate ########## 
 
@@ -81,4 +84,5 @@ from a particular position and return back at another position.
 
 
 
+![image](https://user-images.githubusercontent.com/92646311/206934043-2dda87cf-dda2-4c1b-92cb-fe70d0eb4bd5.png)
 
