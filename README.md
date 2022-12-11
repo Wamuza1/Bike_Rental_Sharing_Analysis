@@ -3,7 +3,7 @@ Time-series forecasting is a technique that utilizes historical and current data
 
 Bike_rental sharing systems are new generation of traditional bike rentals where whole process from membership, rental and return back has become automatic. Through these systems, user is able to easily rent a bike from a particular position and return back at another position.
 
-The purpose of this analysis is to predict the total count of bike rentals, including both casual and registered riders, for the next 30 days. By analyzing Date factor , time of day, we can gain a better understanding of the bike rental trends and make more accurate predictions for the future. This analysis will provide valuable insight for bike rental companies, allowing them to better plan for the future and make more informed decisions.
+The purpose of this analysis is to predict the total count of bike rentals, including both casual and registered riders, for the next 30 days. By analyzing Date factor , time of day, we can gain a better understanding of the bike rental trends and make more accurate predictions for the future. This analysis will provide valuable insight for bike rental companies, allowing them to better plan for the future and make more informed decisions about staffing, supply, and other related matters.
 
 ## Data Dictionary:
 
