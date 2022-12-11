@@ -50,25 +50,29 @@ the city could be detected via monitoring these data.
  - Choose the order of an ARIMA model
  - Forecast the series
 
-########## Examine your data ########## 
-    - Plot the data and examine its patterns and irregularities
-    - Clean up any outliers or missing values if needed
-    - tsoutliers() find the outliers
-    - tsclean() is a convenient method for outlier removal and inputing missing values
-    - Take a logarithm of a series to help stabilize a strong growth trend
+ # Examine your data:
 
-########## Decompose your data ########## 
+   - Plot the data and examine its patterns and irregularities
+   - Clean up any outliers or missing values if needed
+   - tsoutliers() find the outliers
+   - tsclean() is a convenient method for outlier removal and inputing missing values
+   - Take a logarithm of a series to help stabilize a strong growth trend
+
+# Decompose your data:
    
    # Does the series appear to have trends or seasonality?
     
    - Use decompose() or stl() to examine and possibly remove components of the series
 
-########## Stationarity ########## 
+# Stationarity:
 
-   # Is the series stationary?
-    
-   - Use adf.test()
-   - ACF, PACF plots to determine order of differencing needed
+   ### Use adf.test() Dickey-Fuller Test
+   
+   - Data is  series stationary if P-Value is less than 0.05
+  
+   ### ACF, PACF plots 
+   
+   - to determine order of differencing needed 
 
 ########## Autocorrelations and choosing model order ########## 
    
