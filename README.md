@@ -50,18 +50,11 @@ the city could be detected via monitoring these data.
  - Choose the order of an ARIMA model
  - Forecast the series
 
-#######################################################################################################
-## ARIMA cheat sheet 
-#######################################################################################################
-
 ########## Examine your data ########## 
 
     - Plot the data and examine its patterns and irregularities
-    
     - Clean up any outliers or missing values if needed
-    
     - tsclean() is a convenient method for outlier removal and inputing missing values
-    
     - Take a logarithm of a series to help stabilize a strong growth trend
 
 ########## Decompose your data ########## 
@@ -74,8 +67,7 @@ the city could be detected via monitoring these data.
 
 ########## Autocorrelations and choosing model order ########## 
     # Choose order of the ARIMA by examining ACF and PACF plots
-
-##########  Fit an ARIMA model ########## 
+    #  Fit an ARIMA model with optimal parameters
 
 ########## Evaluate and iterate ########## 
     - Check residuals, which should haven no patterns and be normally distributed
@@ -84,6 +76,6 @@ the city could be detected via monitoring these data.
     - Calculate forecast using the chosen model
 
 
-#######################################################################################################
+
 
 
