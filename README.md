@@ -51,7 +51,6 @@ the city could be detected via monitoring these data.
  - Forecast the series
 
 ########## Examine your data ########## 
-
     - Plot the data and examine its patterns and irregularities
     - Clean up any outliers or missing values if needed
     - tsclean() is a convenient method for outlier removal and inputing missing values
@@ -66,8 +65,8 @@ the city could be detected via monitoring these data.
     - Use adf.test(), ACF, PACF plots to determine order of differencing needed
 
 ########## Autocorrelations and choosing model order ########## 
-    # Choose order of the ARIMA by examining ACF and PACF plots
-    #  Fit an ARIMA model with optimal parameters
+    - Choose order of the ARIMA by examining ACF and PACF plots
+    -  Fit an ARIMA model with optimal parameters
 
 ########## Evaluate and iterate ########## 
     - Check residuals, which should haven no patterns and be normally distributed
