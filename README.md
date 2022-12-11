@@ -53,26 +53,35 @@ the city could be detected via monitoring these data.
 ########## Examine your data ########## 
     - Plot the data and examine its patterns and irregularities
     - Clean up any outliers or missing values if needed
+    - tsoutliers() find the outliers
     - tsclean() is a convenient method for outlier removal and inputing missing values
     - Take a logarithm of a series to help stabilize a strong growth trend
 
 ########## Decompose your data ########## 
-    # Does the series appear to have trends or seasonality?
-    # Use decompose() or stl() to examine and possibly remove components of the series
+   
+   # Does the series appear to have trends or seasonality?
+    
+   - Use decompose() or stl() to examine and possibly remove components of the series
 
 ########## Stationarity ########## 
-    - Is the series stationary?
-    - Use adf.test(), ACF, PACF plots to determine order of differencing needed
+
+   # Is the series stationary?
+    
+   - Use adf.test()
+   - ACF, PACF plots to determine order of differencing needed
 
 ########## Autocorrelations and choosing model order ########## 
-    - Choose order of the ARIMA by examining ACF and PACF plots
-    -  Fit an ARIMA model with optimal parameters
+   
+   - Choose order of the ARIMA by examining ACF and PACF plots
+   -  Fit an ARIMA model with optimal parameters(p,d,q)
 
 ########## Evaluate and iterate ########## 
-    - Check residuals, which should haven no patterns and be normally distributed
-    - If there are visible patterns or bias, plot ACF/PACF. Are any additional order parameters needed?
-    - Refit model if needed. Compare model errors and fit criteria such as AIC or BIC.
-    - Calculate forecast using the chosen model
+
+    
+   - Check residuals, which should haven no patterns and be normally distributed
+   - If there are visible patterns or bias, plot ACF/PACF. Are any additional order parameters needed?
+   - Refit model if needed. Compare model errors and fit criteria such as AIC or BIC.
+   - Calculate forecast using the chosen model
 
 
 
