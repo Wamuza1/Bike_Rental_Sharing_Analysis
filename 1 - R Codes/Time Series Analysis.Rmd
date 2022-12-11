@@ -1,0 +1,543 @@
+---
+title: "Time Series Analysis"
+author: "Saba Amin"
+date: "12/08/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+### Free memory Functions
+
+```{r}
+# Clear environment
+rm(list = ls()) 
+
+# Clear console
+cat("\014")  # ctrl+L
+```
+
+
+### Installing needed Packages for the analysis.
+
+```{r}
+#PNeeded <- c("forecast", "ggplot2","tseries")  
+
+#install.packages(PNeeded, dependencies=TRUE)
+```
+
+
+### Aquire Installed Libraries #####
+
+```{r}
+library('ggplot2')
+library('forecast')
+library('tseries')
+```
+
+
+
+#######################################################################################################
+###  Step 1: Loading Data to RStudio
+######################################################################################################## 
+
+```{r}
+bike_rental = read.csv(file.choose(), header=TRUE, stringsAsFactors=FALSE)# day data
+bike_rental
+```
+
+
+
+# bike_rental = read.csv('day.csv')
+
+```{r}
+
+str(bike_rental)
+summary(bike_rental)
+```
+
+
+#######################################################################################################
+###  Step 2: Examine Your Data
+######################################################################################################## 
+
+Converting dteday to Date object
+
+```{r}
+str(bike_rental$dteday) # structure
+
+bike_rental$Date = as.Date(bike_rental$dteday)
+
+str(bike_rental$Date) # structure
+
+```
+
+```{r}
+sum(is.na(bike_rental['cnt']))
+```
+
+
+```{r}
+names(bike_rental) # variable names
+str(bike_rental) # structure
+```
+
+
+```{r}
+```
+```{r}
+# we are using on 2 columns Date And cnt
+ggplot(bike_rental, aes(x = Date, y = cnt)) + 
+                                          geom_line()+ 
+                                    #    scale_x_date('month')+   
+                                         ylab("Daily bike_rental Checkouts") + 
+                                         xlab("month")
+```
+```{r}
+sum(is.na(bike_rental['Date']))
+```
+```{r}
+library(tidyverse)
+
+```
+
+```{r}
+bike_rental <- bike_rental %>% drop_na(Date)
+bike_rental
+  
+```
+```{r}
+sum(is.na(bike_rental['Date']))
+```
+
+
+```{r}
+ggplot(bike_rental, aes(x = Date, y = cnt)) + 
+                                          geom_line()+ 
+                                    #    scale_x_date('month')+   
+                                         ylab("Daily bike_rental Checkouts") + 
+                                         xlab("month")
+```
+
+
+#  In some cases, the number of bicycles checked out dropped below 100 on day and rose to over 4,000 the 
+#  next day. These are suspected outliers that could bias the model by skewing statistical summaries. 
+
+#  R provides a convenient method for removing time series outliers: tsclean() as part of its forecast 
+#  package. tsclean() identifies and replaces outliers using series smoothing and decomposition.
+
+#  This method is also capable of inputing missing values in the series if there are any.Note that we are 
+#  using the ts() command to create a time series object to pass to tsclean():
+
+
+# Converting cnt into ts time series object/targer variable
+
+
+```{r}
+#ts()
+count_ts = ts(bike_rental$cnt)
+count_ts
+```
+
+# Find outliers using tsoutliers()
+
+
+```{r}
+tsoutliers(count_ts) 
+```
+
+```{r}
+bike_rental$clean_cnt = tsclean(count_ts)
+
+names(bike_rental) # variable names
+str(bike_rental) # structure
+```
+
+
+
+```{r}
+ggplot() +
+   geom_line(data = bike_rental, aes(x = Date, y = clean_cnt)) + ylab('Cleaned Bicycle Count')
+   
+```
+
+
+   
+
+############################### Moving Average ############################################################ 
+
+# Even after removing outliers, the daily data is still pretty volatile. Visually, we could  draw a line 
+# through the series tracing its bigger troughs and peaks while smoothing out noisy fluctuations.
+
+# This line can be described by one of the simplest - but also very useful -concepts in time series 
+# analysis known as a moving average. It is an intuitive concept that averages points across several 
+# time periods, thereby smoothing the observed data into a more stable predictable series.
+
+# Formally, a moving average (MA) of order m can be calculated by taking an average of series Y, k periods 
+# around each point:
+
+# The wider the window of the moving average, the smoother original series becomes. In our bicycle example, 
+# we can take weekly or monthly moving average, smoothing the series into something more stable and 
+# therefore predictable:
+
+```{r}
+bike_rental$cnt_ma7 = ma(bike_rental$clean_cnt, order=7) # using the clean count with no outliers
+```
+
+```{r}
+ggplot() +
+  geom_line(data = bike_rental, aes(x = Date, y = clean_cnt, colour = "Counts")) +
+  geom_line(data = bike_rental, aes(x = Date, y = cnt_ma7,   colour = "Weekly Moving Average"))  +
+  #geom_line(data = bike_rental, aes(x = Date, y = cnt_ma30, colour = "Monthly Moving Average"))  +
+  ylab('Bicycle Count')
+```
+
+
+```{r}
+bike_rental$cnt_ma30 = ma(bike_rental$clean_cnt, order=30)
+
+names(bike_rental) # variable names
+str(bike_rental) # structure
+```
+
+
+
+```{r}
+ggplot() +
+  geom_line(data = bike_rental, aes(x = Date, y = clean_cnt, colour = "Counts")) +
+  geom_line(data = bike_rental, aes(x = Date, y = cnt_ma7,   colour = "Weekly Moving Average"))  +
+  geom_line(data = bike_rental, aes(x = Date, y = cnt_ma30, colour = "Monthly Moving Average"))  +
+  ylab('Bicycle Count')
+```
+
+
+# In addition to volatility, modeling daily level data might require specifying multiple seasonality levels,
+# such day of the week, week of the year, month of the year, holidays, etc. For the sake of simplicity, 
+# we will model the smoothed series of weekly moving average (as shown by the blue line above)
+
+#######################################################################################################
+###  Step 3: Decompose Your Data
+######################################################################################################## 
+
+# The building blocks of a time series analysis are seasonality, trend, and cycle. These intuitive 
+# components capture the historical patterns in the series. Not every series will have all three 
+# (or any) of these components, but if they are present, deconstructing the series can help you understand
+# its behavior and prepare a foundation for building a forecasting model.
+
+
+############################### calculate seasonal component of the data  #################################
+```{r}
+count_ma7 = ts(na.omit(bike_rental$cnt_ma7), frequency= 30)  # Need to create two periods
+
+is.ts(count_ma7)
+
+count_ma7
+```
+
+
+
+############  Decompose a time series into seasonal, trend and irregular components  ########################
+
+# If Y is the number of bike rented, we can decompose the series in two ways: by using either an additive 
+# or multiplicative model
+
+# We calculate seasonal component of the data using stl(). STL is a flexible function for decomposing and 
+# forecasting the series. It calculates the seasonal component of the series using smoothing, and adjusts 
+# the original series by subtracting seasonality in two simple lines
+
+```{r}
+#stl()
+
+decomp = stl(count_ma7, s.window = "periodic") # count_ma7 is our TS without missing values
+decomp
+```
+
+
+# Note that stl() by default assumes additive model structure. Use allow.multiplicative.trend=TRUE to incorporate
+# the multiplicative model.
+
+# In the case of additive model structure, the same task of decomposing the series and removing the seasonality
+# can be accomplished by simply subtracting the seasonal component from the original series. seasadj() is a 
+# convenient method inside the forecast package.
+
+```{r}
+deseasonal_cnt <- seasadj(decomp)
+deseasonal_cnt
+```
+
+
+```{r}
+plot(decomp)
+plot(deseasonal_cnt)
+```
+
+
+
+
+# As for the frequency parameter in ts() object, we are specifying periodicity of the data, i.e., number of 
+# observations per period. Since we are using smoothed daily data, we have 30 observations per month.
+
+#######################################################################################################
+###  Step 4: Stationarity
+######################################################################################################## 
+
+# Fitting an ARIMA model requires the series to be stationary. A series is said to be stationary when 
+# its mean, variance, and autocovariance are time invariant. This assumption makes intuitive sense: 
+# Since ARIMA uses previous lags of series to model its behavior, modeling stable series with consistent
+# properties involves less uncertainty. 
+
+# The Augmented Dickey-Fuller (ADF) test is a formal statistical test for stationarity. The null hypothesis
+# assumes that the series is non-stationary. ADF procedure tests whether the change in Y can be explained
+# by lagged value and a linear trend. If contribution of the lagged value to the change in Y is non-significant
+# and there is a presence of a trend component, the series is non-stationary and null hypothesis will not
+# be rejected.
+
+# Our bicycle data is non-stationary; the average number of bike checkouts changes through time, levels 
+# change, etc. A formal ADF test does not reject the null hypothesis of non-stationarity, confirming our 
+# visual inspection:
+
+```{r}
+adf.test(deseasonal_cnt, alternative = "stationary")  # Augmented Dickey-Fuller Test
+```
+
+
+
+
+
+#######################################################################################################
+###  Step 5: Autocorrelations and Choosing Model Order
+######################################################################################################## 
+
+# Autocorrelation plots (also known as ACF or the auto correlation function) are a useful visual tool in 
+# determining whether a series is stationary. These plots can also help to choose the order parameters for 
+# ARIMA model. If the series is correlated with its lags then, generally, there are some trend or seasonal
+# components and therefore its statistical properties are not constant over time
+
+
+# R plots 95% significance boundaries as blue dotted lines. There are significant autocorrelations with many
+# lags in our bike_rental series, as shown by the ACF plot . However, this could be due to carry-over 
+# correlation from the first or early lags, since the PACF plot only shows a spike at lags 1 and 7: 
+
+```{r}
+Acf(deseasonal_cnt, main='ACF for Differenced Series') # ACF plots display correlation between a series and its lags
+
+Pacf(deseasonal_cnt, main='PACF for Differenced Series') # Partial autocorrelation plots (PACF) display correlation
+#between a variable and its lags
+
+
+
+# ACF
+# Ma = significant   
+# Ar = Geometric  
+
+# PACF
+
+#MA = Geometric ar=0
+# AR = Significent
+
+
+
+
+```
+
+
+
+
+# We can start with the order of d = 1 and re-evaluate whether further differencing is needed.
+
+# The augmented Dickey-Fuller test on differenced data rejects the null hypotheses of non-stationarity. 
+# Plotting the differenced series, we see an oscillating pattern around 0 with no visible strong trend.
+# This suggests that differencing of order 1 terms is sufficient and should be included in the model
+
+```{r}
+count_d1 = diff(deseasonal_cnt, differences = 1)
+count_d1
+```
+
+```{r}
+plot(count_d1)
+```
+
+
+```{r}
+adf.test(count_d1, alternative = "stationary")
+```
+
+```{r}
+Acf(count_d1, main='ACF for Differenced Series')
+Pacf(count_d1, main='PACF for Differenced Series')
+```
+
+
+
+
+# https://onlinecourses.science.psu.edu/stat510/node/62
+
+
+# There are significant auto correlations at lag 1 and 2 and beyond. Partial correlation plots show a 
+# significant spike at lag 1 and 7. This suggests that we might want to test models with AR or MA 
+# components of order 1, 2, or 7. A spike at lag 7 might suggest that there is a seasonal pattern 
+# present, perhaps as day of the week. We talk about how to choose model order in the next step.
+
+
+#######################################################################################################
+###  Step 6: Fitting an ARIMA model
+######################################################################################################## 
+
+# Now let's fit a model. The forecast package allows the user to explicitly specify the order of the model
+# using the arima() function, or automatically generate a set of optimal (p, d, q) using auto.arima(). 
+# This function searches through combinations of order parameters and picks the set that optimizes model 
+# fit criteria.
+
+```{r}
+auto.arima(deseasonal_cnt, seasonal=FALSE)
+```
+
+
+
+
+# https://coolstatsblog.com/2013/08/14/using-aic-to-test-arima-models-2/
+
+
+# There exist a number of such criteria for comparing quality of fit across multiple models. Two of the 
+# most widely used are Akaike information criteria (AIC) and Baysian information criteria (BIC). These 
+# criteria are closely related and can be interpreted as an estimate of how much information would be 
+# lost if a given model is chosen. When comparing models, one wants to minimize AIC and BIC.
+
+# While auto.arima() can be very useful, it is still important to complete steps 1-5 in order to understand
+# the series and interpret model results. Note that auto.arima() also allows the user to specify maximum 
+# order for (p, d, q), which is set to 5 by default.
+
+# We can specify non-seasonal ARIMA structure and fit the model to de-seasonalize data. Parameters (1,1,1)
+# suggested by the automated procedure are in line with our expectations based on the steps above; the 
+# model incorporates differencing of degree 1, and uses an autoregressive term of first lag and a moving
+# average model of order 1:
+
+#######################################################################################################
+###  Step 7: Evaluate and Iterate
+######################################################################################################## 
+
+# So now we have fitted a model that can produce a forecast, but does it make sense? Can we trust this model?
+# We can start by examining ACF and PACF plots for model residuals. If model order parameters and structure
+# are correctly specified, we would expect no significant autocorrelations present. 
+
+```{r}
+fit<-auto.arima(deseasonal_cnt, seasonal=FALSE)
+fit
+```
+
+```{r}
+plot(residuals(fit))
+```
+
+
+
+
+
+
+# tsdisplay() can be used to plot  model diagnostics
+
+```{r}
+tsdisplay(residuals(fit), lag.max=45, main='(3,1,7) Model Residuals')
+```
+
+
+
+# There is a clear pattern present in ACF/PACF and model residuals plots repeating at lag 7. This suggests
+# that our model may be better off with a different specification
+
+
+# We can repeat the fitting process allowing for the MA(7) component and examine diagnostic plots again.
+
+```{r}
+fit2 = arima(deseasonal_cnt, order=c(4,1,9))
+
+fit2
+```
+
+```{r}
+
+tsdisplay(residuals(fit2), lag.max=45, main='Seasonal Model Residuals')
+```
+
+
+
+
+
+# This time, there are no significant autocorrelations present. If the model is not correctly specified,
+# that will usually be reflected in residuals in the form of trends, skeweness, or any other patterns
+# not captured by the model. 
+
+# Ideally, residuals should look like white noise, meaning they are normally distributed. 
+# A convenience function tsdisplay() can be used to plot these model diagnostics. Residuals
+# plots show a smaller error range, more or less centered around 0. We can observe that AIC is smaller
+# for the (1, 1, 7) structure as well
+
+#######################################################################################################
+###  Step 8: Forecasting
+######################################################################################################## 
+
+# Forecasting using a fitted model is straightforward in R. We can specify forecast horizon h periods 
+# ahead for predictions to be made, and use the fitted model to generate those predictions:
+
+```{r}
+fcast <- forecast(fit2, h=30)
+plot(fcast)
+```
+
+
+
+
+# The light blue line in the plot shows the fit provided by the model, but what if we wanted to get a sense 
+# of how the model will perform in the future? One method is to reserve a portion of our data as a 
+# "hold-out" set, fit the model, and then compare the forecast to the actual observed values
+
+```{r}
+hold <- window(ts(deseasonal_cnt), start=258)
+hold
+```
+
+
+```{r}
+fit_no_holdout = arima(ts(deseasonal_cnt[-c(258:282)]), order=c(3,1,9))
+fit_no_holdout
+```
+
+
+```{r}
+fcast_no_holdout <- forecast(fit_no_holdout,h=30)
+fcast_no_holdout
+```
+
+
+```{r}
+plot(fcast_no_holdout, main=" ")
+lines(ts(deseasonal_cnt))
+```
+
+
+
+# How can we improve the forecast and iterate on this model? One simple change is to add back the
+# seasonal component we extracted earlier. Another approach would be to allow for (P, D, Q) components
+# to be included to the model, which is a default in the auto.arima() function. Re-fitting the model
+# on the same data, we see that there still might be some seasonal pattern in the series, with the
+# seasonal component described by AR(1)
+
+```{r}
+fit_w_seasonality = auto.arima(deseasonal_cnt, seasonal=TRUE)
+fit_w_seasonality
+```
+
+
+# Note that (p,d,q) parameters also changed after we included a seasonal component. We can go through the same
+# process of evaluating model residuals and ACF/PACF plots and adjusting the structure if necessary. 
+# For example, we notice the same evidence of higher order is present in the auto correlations with 
+# lag, which suggests that a higher-order component might be needed
+
+
+```
+
