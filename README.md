@@ -55,9 +55,13 @@ the city could be detected via monitoring these data.
 #######################################################################################################
 
 ########## Examine your data ########## 
+
     - Plot the data and examine its patterns and irregularities
+    
     - Clean up any outliers or missing values if needed
+    
     - tsclean() is a convenient method for outlier removal and inputing missing values
+    
     - Take a logarithm of a series to help stabilize a strong growth trend
 
 ########## Decompose your data ########## 
