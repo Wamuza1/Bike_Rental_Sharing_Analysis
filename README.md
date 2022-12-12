@@ -84,5 +84,5 @@ The purpose of this analysis is to predict the total count of bike rentals, incl
 
 
 
-![image](https://user-images.githubusercontent.com/92646311/206934043-2dda87cf-dda2-4c1b-92cb-fe70d0eb4bd5.png)
+
 
